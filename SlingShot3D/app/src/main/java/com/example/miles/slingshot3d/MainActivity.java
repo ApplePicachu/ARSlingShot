@@ -14,6 +14,8 @@ public class MainActivity extends ARActivity {
     private FrameLayout aRlayout;
     private RelativeLayout aRParentLayout;
 
+    //commit by miles 12/1 6.13
+
     int width;
     int height;
 
