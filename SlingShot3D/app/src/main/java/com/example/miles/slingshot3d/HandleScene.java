@@ -116,7 +116,7 @@ public class HandleScene {
                     mo = new MovingObject(new Vector3d(), new Vector3d(shootingDirection.x, shootingDirection.y, shootingDirection.z));
 //                    mo = new MovingObject(new Vector3d(projectileM[12], projectileM[13], projectileM[14]),
 //                            new Vector3d(shootingDirection.x, shootingDirection.y, shootingDirection.z));
-                    fc =  new FlyingCalculator(mo, 100);
+                    fc =  new FlyingCalculator(mo, 200);
                     launchLocMatrix = baseM;
                 }
             }
@@ -137,37 +137,36 @@ public class HandleScene {
             drawPOMBall(gl);
             Log.e("Ready", "shoot");
         }
-        gl.glLoadIdentity();
+        gl.glLoadMatrixf(baseM, 0);
         line.draw(gl);
 
         if (MODEL_LOADED && isReady) {
             gl.glLoadMatrixf(projectileM, 0);
             drawPOMBall(gl);
-            gl.glLoadMatrixf(baseM, 0);
-            drawPOMBall(gl);
         }
     }
 
     private void calcShootingVector() {
-        float[] pointBase = new float[3];
+        float[] pointBase = new float[4];
         pointBase[0] = baseM[12];
         pointBase[1] = baseM[13];
         pointBase[2] = baseM[14];
-        float[] pointProjectile = new float[3];
+        pointBase[3] = 1;
+        float[] pointProjectile = new float[4];
         pointProjectile[0] = projectileM[12];
         pointProjectile[1] = projectileM[13];
         pointProjectile[2] = projectileM[14];
+        pointProjectile[3] = 1;
 
-        shootingDirection.x = pointBase[0] - pointProjectile[0];
-        shootingDirection.y = pointBase[1] - pointProjectile[1];
-        shootingDirection.z = pointBase[2] - pointProjectile[2];
         float[] invM = new float[16];
         Matrix.invertM(invM, 0, baseM, 0);
-        float[] resV = {shootingDirection.x,shootingDirection.y,shootingDirection.z, 1};
-        Matrix.multiplyMV(resV, 0, invM, 0, resV, 0);
-        shootingDirection.x = resV[0];
-        shootingDirection.y = resV[1];
-        shootingDirection.z = resV[2];
+        Matrix.multiplyMV(pointBase, 0, invM, 0, pointBase, 0);
+        Matrix.multiplyMV(pointProjectile, 0, invM, 0, pointProjectile, 0);
+        //Log.d("test", "pointBase\n" + pointBase[0] + ", " + pointBase[1] + ", " + pointBase[2] + ", " + pointBase[3]);
+        //Log.d("test", "pointProjectile\n"+pointProjectile[0]+", "+pointProjectile[1]+", "+pointProjectile[2]+", "+pointProjectile[3]);
+        shootingDirection.x = -pointProjectile[0];
+        shootingDirection.y = -pointProjectile[1];
+        shootingDirection.z = -pointProjectile[2];
         float h = 120.0f - (shootingDirection.length() - ARM_THRESHOLD) * 120.0f / 40.0f;
         float[] hsv = {h, 1.0f, 1.0f};
         line.setLine(pointBase, pointProjectile);
