@@ -7,7 +7,6 @@ import android.util.Log;
 
 import com.example.miles.slingshot3d.FlyingCalculator.FlyingCalculator;
 import com.example.miles.slingshot3d.FlyingCalculator.MovingObject;
-import com.example.miles.slingshot3d.STLModelReaderPack.Model;
 import com.example.miles.slingshot3d.TestModels.ColorCube;
 import com.example.miles.slingshot3d.TestModels.ColorLine;
 
@@ -32,12 +31,12 @@ public class HandleScene {
     private boolean isNoProjectileM;
     private Vector3f shootingDirection;
 
-    private Model ballHShellTop;
-    private Model ballHShellRing;
-    private Model ballHShellTop1;
-    private Model ballHShellRing1;
-    private Model ballHShellButtonBase;
-    private Model ballHShellButton;
+    private MovingObject ballHShellTop;
+    private MovingObject ballHShellRing;
+    private MovingObject ballHShellTop1;
+    private MovingObject ballHShellRing1;
+    private MovingObject ballHShellButtonBase;
+    private MovingObject ballHShellButton;
 
     private boolean MODEL_LOADED = false;
 
@@ -114,8 +113,6 @@ public class HandleScene {
                     isArmed = false;
                     Log.e("object velocity", shootingDirection.x + " " + shootingDirection.y + " " + shootingDirection.z + " ");
                     mo = new MovingObject(new Vector3d(), new Vector3d(shootingDirection.x, shootingDirection.y, shootingDirection.z));
-//                    mo = new MovingObject(new Vector3d(projectileM[12], projectileM[13], projectileM[14]),
-//                            new Vector3d(shootingDirection.x, shootingDirection.y, shootingDirection.z));
                     fc =  new FlyingCalculator(mo, 200);
                     launchLocMatrix = baseM;
                 }
@@ -125,15 +122,10 @@ public class HandleScene {
         isNoProjectileM = true;
 
         gl.glMatrixMode(GL10.GL_MODELVIEW);
-//		gl.glLoadMatrixf(baseM, 0);
-//		cube[0].draw(gl);
-
         if (!isReady) {
-//			cube[1].draw(gl);
             fc.nextFrame();
             gl.glLoadMatrixf(baseM, 0);
             gl.glMultMatrixf(mo.getTransMatrixf(), 0);
-
             drawPOMBall(gl);
             Log.e("Ready", "shoot");
         }
@@ -162,8 +154,6 @@ public class HandleScene {
         Matrix.invertM(invM, 0, baseM, 0);
         Matrix.multiplyMV(pointBase, 0, invM, 0, pointBase, 0);
         Matrix.multiplyMV(pointProjectile, 0, invM, 0, pointProjectile, 0);
-        //Log.d("test", "pointBase\n" + pointBase[0] + ", " + pointBase[1] + ", " + pointBase[2] + ", " + pointBase[3]);
-        //Log.d("test", "pointProjectile\n"+pointProjectile[0]+", "+pointProjectile[1]+", "+pointProjectile[2]+", "+pointProjectile[3]);
         shootingDirection.x = -pointProjectile[0];
         shootingDirection.y = -pointProjectile[1];
         shootingDirection.z = -pointProjectile[2];
@@ -189,16 +179,13 @@ public class HandleScene {
         @Override
         public void run() {
             Log.e("Model", "MODEL_LOADED: " + MODEL_LOADED);
-            ballHShellTop = new Model("PocketMonBallShellTop.STL", new float[]{1, 1, 1});
-            ballHShellRing = new Model("PocketMonBallShellRing.STL", new float[]{0, 0, 0});
-            ballHShellRing1 = new Model("PocketMonBallShellRing.STL", new float[]{0, 0, 0});
-            ballHShellTop1 = new Model("PocketMonBallShellTop.STL", new float[]{1, 0, 0});
+            ballHShellTop = new MovingObject("PocketMonBallShellTop.STL", new float[]{1, 1, 1});
+            ballHShellRing = new MovingObject("PocketMonBallShellRing.STL", new float[]{0, 0, 0});
+            ballHShellRing1 = new MovingObject("PocketMonBallShellRing.STL", new float[]{0, 0, 0});
+            ballHShellTop1 = new MovingObject("PocketMonBallShellTop.STL", new float[]{1, 0, 0});
 
-            ballHShellButton = new Model("PocketMonBallButton.STL", new float[]{0.5f, 0.5f, 0.5f});
-            ballHShellButtonBase = new Model("PocketMonBallButtonBase.STL", new float[]{0.5f, 0.5f, 0.5f});
-
-            Log.e("Model", "MODEL_LOADED: " + ballHShellButton.isLoaded() + ballHShellButtonBase.isLoaded() + ballHShellRing.isLoaded()
-                    + ballHShellRing1.isLoaded() + ballHShellTop.isLoaded() + ballHShellTop1.isLoaded());
+            ballHShellButton = new MovingObject("PocketMonBallButton.STL", new float[]{0.5f, 0.5f, 0.5f});
+            ballHShellButtonBase = new MovingObject("PocketMonBallButtonBase.STL", new float[]{0.5f, 0.5f, 0.5f});
 
             if (ballHShellButton.isLoaded() && ballHShellButtonBase.isLoaded() && ballHShellRing.isLoaded()
                     && ballHShellRing1.isLoaded() && ballHShellTop.isLoaded() && ballHShellTop1.isLoaded()) {
