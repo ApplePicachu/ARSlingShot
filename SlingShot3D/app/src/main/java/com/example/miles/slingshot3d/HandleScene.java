@@ -43,6 +43,7 @@ public class HandleScene {
 
     //****pika****//
     private DrawableObject pikaBody;
+    private DrawableObject pikaNose;
     private DrawableObject pikaEarL;
     private DrawableObject pikaEarR;
     private DrawableObject pikaTail;
@@ -194,6 +195,7 @@ public class HandleScene {
         gl.glTranslatef(0, -80.0f, -80.0f);
         gl.glScalef(8.0f, 8.0f, 8.0f);
         pikaBody.draw(gl);
+        pikaNose.draw(gl);
         pikaEarL.draw(gl);
         pikaEarR.draw(gl);
         pikaTail.draw(gl);
@@ -214,6 +216,7 @@ public class HandleScene {
 
             //****pika****//
             pikaBody = new DrawableObject(R.raw.pikachufixed, new float[]{1, 1, 0}, context);
+            pikaNose = new DrawableObject(R.raw.pikachufixednose, new float[]{0, 0, 0}, context);
             pikaEarL = new DrawableObject(R.raw.pikachufixedearl, new float[]{0, 0, 0}, context);
             pikaEarR = new DrawableObject(R.raw.pikachufixedearr, new float[]{0, 0, 0}, context);
             pikaTail = new DrawableObject(R.raw.pikachufixedtail, new float[]{184f / 255f, 134f / 255f, 11f / 255f}, context);
