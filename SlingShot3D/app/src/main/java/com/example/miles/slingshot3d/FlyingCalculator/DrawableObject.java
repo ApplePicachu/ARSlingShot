@@ -1,5 +1,6 @@
 package com.example.miles.slingshot3d.FlyingCalculator;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.example.miles.slingshot3d.STLModelReaderPack.FileReader;
@@ -49,9 +50,9 @@ public class DrawableObject {
         }
     }
 
-    public DrawableObject(String filename, float[] inColor) {
+    public DrawableObject(int fileID, float[] inColor, Context ctx) {
         initDO();
-        vertex = FileReader.ReadStlBinary(filename);
+        vertex = FileReader.ReadStlBinary(fileID, ctx);
         if (vertex[0] != -1) {
             initBuffer(vertex, inColor);
         } else {

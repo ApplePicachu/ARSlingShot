@@ -49,6 +49,8 @@
 
 package com.example.miles.slingshot3d;
 
+import android.content.Context;
+
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 import org.artoolkit.ar.base.rendering.RenderUtils;
@@ -72,11 +74,11 @@ public class SimpleRenderer extends ARRenderer {
 	private FloatBuffer diffuseBuffer;
 	private FloatBuffer lightPosBuffer;
 
-	public SimpleRenderer() {
+	public SimpleRenderer(Context ctx) {
 		ambientBuffer = RenderUtils.buildFloatBuffer(ambientLight);
 		diffuseBuffer = RenderUtils.buildFloatBuffer(diffuseLight);
 		lightPosBuffer = RenderUtils.buildFloatBuffer(lightPos);
-		handleScene = new HandleScene();
+		handleScene = new HandleScene(ctx);
 	}
 
 	/**

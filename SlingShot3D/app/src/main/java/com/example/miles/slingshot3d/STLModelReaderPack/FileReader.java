@@ -1,9 +1,8 @@
 package com.example.miles.slingshot3d.STLModelReaderPack;
 
+import android.content.Context;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,13 +14,12 @@ import java.nio.ByteOrder;
  */
 public class FileReader {
 
-    public static float[] ReadStlBinary(String fileName) {
+    public static float[] ReadStlBinary(int fileID, Context ctx) {
         float[] ospVert = new float[0];
-        File file = new File("/sdcard/" + fileName);
         InputStream inputStream = null;
 
         try {
-            inputStream = new FileInputStream(file);
+            inputStream = ctx.getResources().openRawResource(fileID);
 
             int count;
             byte[] buffer = new byte[84];

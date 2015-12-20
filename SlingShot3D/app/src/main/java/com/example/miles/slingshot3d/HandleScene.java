@@ -1,10 +1,12 @@
 package com.example.miles.slingshot3d;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.opengl.Matrix;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.example.miles.slingshot3d.FlyingCalculator.DrawableObject;
 import com.example.miles.slingshot3d.FlyingCalculator.FlyingCalculator;
 import com.example.miles.slingshot3d.FlyingCalculator.MovingObject;
 import com.example.miles.slingshot3d.TestModels.ColorCube;
@@ -31,6 +33,7 @@ public class HandleScene {
     private boolean isNoProjectileM;
     private Vector3f shootingDirection;
 
+    //****ball****//
     private MovingObject ballHShellTop;
     private MovingObject ballHShellRing;
     private MovingObject ballHShellTop1;
@@ -38,13 +41,21 @@ public class HandleScene {
     private MovingObject ballHShellButtonBase;
     private MovingObject ballHShellButton;
 
+    //****pika****//
+    private DrawableObject pikaBody;
+    private DrawableObject pikaEarL;
+    private DrawableObject pikaEarR;
+    private DrawableObject pikaTail;
+
+    private Context context;
+
     private boolean MODEL_LOADED = false;
 
     private MovingObject mo;
     private FlyingCalculator fc;
     private float[] launchLocMatrix = new float[16];
 
-    public HandleScene() {
+    public HandleScene(Context ctx) {
         baseM = new float[16];
         projectileM = new float[16];
 
@@ -54,6 +65,7 @@ public class HandleScene {
         line = new ColorLine();
 
         time = new Time();
+        context = ctx;
         loadSTL.start();
 
         shootingDirection = new Vector3f();
@@ -131,6 +143,9 @@ public class HandleScene {
         }
         gl.glLoadMatrixf(baseM, 0);
         line.draw(gl);
+        if (MODEL_LOADED) {
+            drawPIKA(gl);
+        }
 
         if (MODEL_LOADED && isReady) {
             gl.glLoadMatrixf(projectileM, 0);
@@ -175,20 +190,38 @@ public class HandleScene {
         ballHShellRing1.draw(gl);
     }
 
+    private void drawPIKA(GL10 gl) {
+        gl.glTranslatef(0, -80.0f, -80.0f);
+        gl.glScalef(8.0f, 8.0f, 8.0f);
+        pikaBody.draw(gl);
+        pikaEarL.draw(gl);
+        pikaEarR.draw(gl);
+        pikaTail.draw(gl);
+    }
+
     Thread loadSTL = new Thread(new Runnable() {
         @Override
         public void run() {
             Log.e("Model", "MODEL_LOADED: " + MODEL_LOADED);
-            ballHShellTop = new MovingObject("PocketMonBallShellTop.STL", new float[]{1, 1, 1});
-            ballHShellRing = new MovingObject("PocketMonBallShellRing.STL", new float[]{0, 0, 0});
-            ballHShellRing1 = new MovingObject("PocketMonBallShellRing.STL", new float[]{0, 0, 0});
-            ballHShellTop1 = new MovingObject("PocketMonBallShellTop.STL", new float[]{1, 0, 0});
+            //****ball****//
+            ballHShellTop = new MovingObject(R.raw.pocketmonballshelltop, new float[]{1, 1, 1}, context);
+            ballHShellRing = new MovingObject(R.raw.pocketmonballshellring, new float[]{0, 0, 0}, context);
+            ballHShellRing1 = new MovingObject(R.raw.pocketmonballshellring, new float[]{0, 0, 0}, context);
+            ballHShellTop1 = new MovingObject(R.raw.pocketmonballshelltop, new float[]{1, 0, 0}, context);
 
-            ballHShellButton = new MovingObject("PocketMonBallButton.STL", new float[]{0.5f, 0.5f, 0.5f});
-            ballHShellButtonBase = new MovingObject("PocketMonBallButtonBase.STL", new float[]{0.5f, 0.5f, 0.5f});
+            ballHShellButton = new MovingObject(R.raw.pocketmonballbutton, new float[]{0.5f, 0.5f, 0.5f}, context);
+            ballHShellButtonBase = new MovingObject(R.raw.pocketmonballbuttonbase, new float[]{0.5f, 0.5f, 0.5f}, context);
+
+            //****pika****//
+            pikaBody = new DrawableObject(R.raw.pikachufixed, new float[]{1, 1, 0}, context);
+            pikaEarL = new DrawableObject(R.raw.pikachufixedearl, new float[]{0, 0, 0}, context);
+            pikaEarR = new DrawableObject(R.raw.pikachufixedearr, new float[]{0, 0, 0}, context);
+            pikaTail = new DrawableObject(R.raw.pikachufixedtail, new float[]{184f / 255f, 134f / 255f, 11f / 255f}, context);
+
 
             if (ballHShellButton.isLoaded() && ballHShellButtonBase.isLoaded() && ballHShellRing.isLoaded()
-                    && ballHShellRing1.isLoaded() && ballHShellTop.isLoaded() && ballHShellTop1.isLoaded()) {
+                    && ballHShellRing1.isLoaded() && ballHShellTop.isLoaded() && ballHShellTop1.isLoaded()
+                    && pikaTail.isLoaded() && pikaEarR.isLoaded() && pikaEarL.isLoaded() && pikaBody.isLoaded()) {
                 MODEL_LOADED = true;
             }
         }
