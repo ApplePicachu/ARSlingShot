@@ -48,6 +48,14 @@ public class HandleScene {
     private DrawableObject pikaEarR;
     private DrawableObject pikaTail;
 
+    //****wall****//
+    private DrawableObject wallBase;
+    private DrawableObject wallBrick;
+
+    //****tree****//
+    private DrawableObject treeBase;
+    private DrawableObject treeLeaf;
+
     private Context context;
 
     private boolean MODEL_LOADED = false;
@@ -144,10 +152,15 @@ public class HandleScene {
         }
         gl.glLoadMatrixf(baseM, 0);
         line.draw(gl);
-        if (MODEL_LOADED) {
-            drawPIKA(gl);
-        }
 
+        if (MODEL_LOADED) {
+            gl.glLoadMatrixf(baseM, 0);
+            drawWall(gl);
+            gl.glLoadMatrixf(baseM, 0);
+            drawPIKA(gl);
+            gl.glLoadMatrixf(baseM, 0);
+            drawTree(gl);
+        }
         if (MODEL_LOADED && isReady) {
             gl.glLoadMatrixf(projectileM, 0);
             drawPOMBall(gl);
@@ -177,7 +190,6 @@ public class HandleScene {
         float[] hsv = {h, 1.0f, 1.0f};
         line.setLine(pointBase, pointProjectile);
         line.setColor(Color.GREEN, Color.HSVToColor(255, hsv));
-
     }
 
     private void drawPOMBall(GL10 gl){
@@ -201,6 +213,22 @@ public class HandleScene {
         pikaTail.draw(gl);
     }
 
+    private void drawWall(GL10 gl) {
+        gl.glScalef(5.0f, 5.0f, 5.0f);
+        gl.glTranslatef(0, 80.0f, 0);
+        gl.glRotatef(90, 1, 0, 0);
+        wallBase.draw(gl);
+        wallBrick.draw(gl);
+    }
+
+    private void drawTree(GL10 gl) {
+        gl.glTranslatef(-80.0f, 80.0f, 0);
+        gl.glRotatef(90, 1, 0, 0);
+        gl.glScalef(0.05f, 0.05f, 0.05f);
+        treeBase.draw(gl);
+        treeLeaf.draw(gl);
+    }
+
     Thread loadSTL = new Thread(new Runnable() {
         @Override
         public void run() {
@@ -221,10 +249,19 @@ public class HandleScene {
             pikaEarR = new DrawableObject(R.raw.pikachufixedearr, new float[]{0, 0, 0}, context);
             pikaTail = new DrawableObject(R.raw.pikachufixedtail, new float[]{184f / 255f, 134f / 255f, 11f / 255f}, context);
 
+            //****wall****//
+            wallBase = new DrawableObject(R.raw.wallbase, new float[]{0.8f, 0.8f, 0.8f}, context);
+            wallBrick = new DrawableObject(R.raw.wallbrick, new float[]{178f / 255f, 34 / 255f, 34 / 255f}, context);
+
+            //****tree****//
+            treeBase = new DrawableObject(R.raw.tbase, new float[]{184f / 255f * 0.05f, 134f / 255f * 0.05f, 11f / 255f * 0.05f}, context);
+            treeLeaf = new DrawableObject(R.raw.tleaf, new float[]{0, 0.05f, 0}, context);
 
             if (ballHShellButton.isLoaded() && ballHShellButtonBase.isLoaded() && ballHShellRing.isLoaded()
                     && ballHShellRing1.isLoaded() && ballHShellTop.isLoaded() && ballHShellTop1.isLoaded()
-                    && pikaTail.isLoaded() && pikaEarR.isLoaded() && pikaEarL.isLoaded() && pikaBody.isLoaded()) {
+                    && pikaTail.isLoaded() && pikaEarR.isLoaded() && pikaEarL.isLoaded() && pikaBody.isLoaded()
+                    && wallBrick.isLoaded() && wallBase.isLoaded()
+                    && treeBase.isLoaded() && treeLeaf.isLoaded()) {
                 MODEL_LOADED = true;
             }
         }
