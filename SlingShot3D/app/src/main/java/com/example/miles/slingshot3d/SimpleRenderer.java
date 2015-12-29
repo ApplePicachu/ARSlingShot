@@ -121,7 +121,7 @@ public class SimpleRenderer extends ARRenderer {
         gl.glMatrixMode(GL10.GL_PROJECTION);
         gl.glLoadMatrixf(ARToolKit.getInstance().getProjectionMatrix(), 0);
 
-        gl.glEnable(GL10.GL_CULL_FACE);
+//        gl.glEnable(GL10.GL_CULL_FACE);
         gl.glShadeModel(GL10.GL_SMOOTH);
         gl.glEnable(GL10.GL_DEPTH_TEST);
         gl.glFrontFace(GL10.GL_CCW);

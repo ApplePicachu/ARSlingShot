@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.example.miles.slingshot3d.FlyingCalculator.ContactFace;
 import com.example.miles.slingshot3d.FlyingCalculator.DrawableObject;
 import com.example.miles.slingshot3d.FlyingCalculator.FlyingCalculator;
 import com.example.miles.slingshot3d.FlyingCalculator.MonsterBallObject;
@@ -14,6 +15,7 @@ import com.example.miles.slingshot3d.TestModels.ColorCube;
 import com.example.miles.slingshot3d.TestModels.ColorLine;
 
 import javax.microedition.khronos.opengles.GL10;
+import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
@@ -46,6 +48,7 @@ public class HandleScene {
 
     //****wall****//
     private ObstacleObject brickWall;
+    private ObstacleObject ground;
 
     //****tree****//
     private DrawableObject treeBase;
@@ -148,12 +151,21 @@ public class HandleScene {
         line.draw(gl);
 
         if (MODEL_LOADED) {
-            float[] temp = brickWall.getPositonf();
+            float[] temp = ground.getPositonf();
             gl.glLoadMatrixf(baseM, 0);
             gl.glTranslatef(temp[0], temp[1], temp[2]);
+            gl.glScalef(10.0f, 10.0f, 10.0f);
+            ground.draw(gl);
+
+            temp = brickWall.getPositonf();
+            gl.glLoadMatrixf(baseM, 0);
+            gl.glTranslatef(temp[0], temp[1], temp[2]);
+            gl.glRotatef(90, 1, 0, 0);
             brickWall.draw(gl);
+
             gl.glLoadMatrixf(baseM, 0);
             drawPIKA(gl);
+
             gl.glLoadMatrixf(baseM, 0);
             drawTree(gl);
         }
@@ -223,7 +235,14 @@ public class HandleScene {
             //****wall****//
             brickWall = ObstacleObject.create(0, R.raw.wallbase, new float[]{0.8f, 0.8f, 0.8f}, context);
             brickWall.addModels(R.raw.wallbrick, new float[]{178f / 255f, 34 / 255f, 34 / 255f}, context);
-            brickWall.setPositon(new Vector3d(0, 150, 0));
+            brickWall.setPositon(new Vector3d(0, 400, -90 + 24));
+            ContactFace contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, -1, 0), new Vector3d(0, 0, 1), 40.5, 48, false);
+            brickWall.setContactFace(contactFace);
+
+            ground = ObstacleObject.create(0, R.raw.wallbase, new float[]{0.8f, 0.8f, 0.8f}, context);
+            ground.setPositon(new Vector3d(0, 200, -90));
+            contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, 0, 1), new Vector3d(1, 0, 0), 405, 480, false);
+            ground.setContactFace(contactFace);
 
             //****tree****//
             treeBase = new DrawableObject(R.raw.tbase, new float[]{184f / 255f * 0.05f, 134f / 255f * 0.05f, 11f / 255f * 0.05f}, context);
@@ -232,6 +251,7 @@ public class HandleScene {
             fc = new FlyingCalculator(200);
             fc.setMonsterBall(monsterball);
             fc.addObstacle(brickWall);
+            fc.addObstacle(ground);
 
             if (monsterball.isLoaded()
                     && pikaTail.isLoaded() && pikaEarR.isLoaded() && pikaEarL.isLoaded() && pikaBody.isLoaded()
