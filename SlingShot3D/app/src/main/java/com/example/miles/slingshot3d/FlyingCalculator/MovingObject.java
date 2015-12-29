@@ -50,6 +50,22 @@ public class MovingObject extends DrawableObject {
         velocity = new Vector3d(inVelocity.getX(), inVelocity.getY(), inVelocity.getZ());
     }
 
+    public Vector3d getVelocity() {
+        return velocity;
+    }
+
+    public void setVelocity(Vector3d velocity) {
+        this.velocity = velocity;
+    }
+
+    public AxisAngle4d getRotVel() {
+        return rotVel;
+    }
+
+    public void setRotVel(AxisAngle4d rotVel) {
+        this.rotVel = rotVel;
+    }
+
     private void initBaseMO() {
         velocity = new Vector3d(10, 10, 10);
         rotVel = new AxisAngle4d(1, 0, 0, 0);

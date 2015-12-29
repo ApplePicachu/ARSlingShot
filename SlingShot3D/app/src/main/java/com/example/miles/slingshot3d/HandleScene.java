@@ -8,7 +8,8 @@ import android.util.Log;
 
 import com.example.miles.slingshot3d.FlyingCalculator.DrawableObject;
 import com.example.miles.slingshot3d.FlyingCalculator.FlyingCalculator;
-import com.example.miles.slingshot3d.FlyingCalculator.MovingObject;
+import com.example.miles.slingshot3d.FlyingCalculator.MonsterBallObject;
+import com.example.miles.slingshot3d.FlyingCalculator.ObstacleObject;
 import com.example.miles.slingshot3d.TestModels.ColorCube;
 import com.example.miles.slingshot3d.TestModels.ColorLine;
 
@@ -34,12 +35,7 @@ public class HandleScene {
     private Vector3f shootingDirection;
 
     //****ball****//
-    private MovingObject ballHShellTop;
-    private MovingObject ballHShellRing;
-    private MovingObject ballHShellTop1;
-    private MovingObject ballHShellRing1;
-    private MovingObject ballHShellButtonBase;
-    private MovingObject ballHShellButton;
+    private MonsterBallObject monsterball;
 
     //****pika****//
     private DrawableObject pikaBody;
@@ -49,8 +45,7 @@ public class HandleScene {
     private DrawableObject pikaTail;
 
     //****wall****//
-    private DrawableObject wallBase;
-    private DrawableObject wallBrick;
+    private ObstacleObject brickWall;
 
     //****tree****//
     private DrawableObject treeBase;
@@ -60,7 +55,6 @@ public class HandleScene {
 
     private boolean MODEL_LOADED = false;
 
-    private MovingObject mo;
     private FlyingCalculator fc;
     private float[] launchLocMatrix = new float[16];
 
@@ -133,8 +127,8 @@ public class HandleScene {
                     isReady = false;
                     isArmed = false;
                     Log.e("object velocity", shootingDirection.x + " " + shootingDirection.y + " " + shootingDirection.z + " ");
-                    mo = new MovingObject(new Vector3d(), new Vector3d(shootingDirection.x, shootingDirection.y, shootingDirection.z));
-                    fc =  new FlyingCalculator(mo, 200);
+                    monsterball.setPositon(new Vector3d());
+                    monsterball.setVelocity(new Vector3d(shootingDirection.x, shootingDirection.y, shootingDirection.z));
                     launchLocMatrix = baseM;
                 }
             }
@@ -146,16 +140,18 @@ public class HandleScene {
         if (!isReady) {
             fc.nextFrame();
             gl.glLoadMatrixf(baseM, 0);
-            gl.glMultMatrixf(mo.getTransMatrixf(), 0);
-            drawPOMBall(gl);
+            gl.glMultMatrixf(monsterball.getTransMatrixf(), 0);
+            monsterball.draw(gl);
             Log.e("Ready", "shoot");
         }
         gl.glLoadMatrixf(baseM, 0);
         line.draw(gl);
 
         if (MODEL_LOADED) {
+            float[] temp = brickWall.getPositonf();
             gl.glLoadMatrixf(baseM, 0);
-            drawWall(gl);
+            gl.glTranslatef(temp[0], temp[1], temp[2]);
+            brickWall.draw(gl);
             gl.glLoadMatrixf(baseM, 0);
             drawPIKA(gl);
             gl.glLoadMatrixf(baseM, 0);
@@ -163,7 +159,7 @@ public class HandleScene {
         }
         if (MODEL_LOADED && isReady) {
             gl.glLoadMatrixf(projectileM, 0);
-            drawPOMBall(gl);
+            monsterball.draw(gl);
         }
     }
 
@@ -192,17 +188,6 @@ public class HandleScene {
         line.setColor(Color.GREEN, Color.HSVToColor(255, hsv));
     }
 
-    private void drawPOMBall(GL10 gl){
-        ballHShellTop.draw(gl);
-        ballHShellRing.draw(gl);
-        ballHShellButton.draw(gl);
-        ballHShellButtonBase.draw(gl);
-
-        gl.glRotatef(180, 0, 1, 0);
-        ballHShellTop1.draw(gl);
-        ballHShellRing1.draw(gl);
-    }
-
     private void drawPIKA(GL10 gl) {
         gl.glTranslatef(0, -80.0f, -80.0f);
         gl.glScalef(8.0f, 8.0f, 8.0f);
@@ -211,14 +196,6 @@ public class HandleScene {
         pikaEarL.draw(gl);
         pikaEarR.draw(gl);
         pikaTail.draw(gl);
-    }
-
-    private void drawWall(GL10 gl) {
-        gl.glScalef(5.0f, 5.0f, 5.0f);
-        gl.glTranslatef(0, 80.0f, 0);
-        gl.glRotatef(90, 1, 0, 0);
-        wallBase.draw(gl);
-        wallBrick.draw(gl);
     }
 
     private void drawTree(GL10 gl) {
@@ -234,13 +211,7 @@ public class HandleScene {
         public void run() {
             Log.e("Model", "MODEL_LOADED: " + MODEL_LOADED);
             //****ball****//
-            ballHShellTop = new MovingObject(R.raw.pocketmonballshelltop, new float[]{1, 1, 1}, context);
-            ballHShellRing = new MovingObject(R.raw.pocketmonballshellring, new float[]{0, 0, 0}, context);
-            ballHShellRing1 = new MovingObject(R.raw.pocketmonballshellring, new float[]{0, 0, 0}, context);
-            ballHShellTop1 = new MovingObject(R.raw.pocketmonballshelltop, new float[]{1, 0, 0}, context);
-
-            ballHShellButton = new MovingObject(R.raw.pocketmonballbutton, new float[]{0.5f, 0.5f, 0.5f}, context);
-            ballHShellButtonBase = new MovingObject(R.raw.pocketmonballbuttonbase, new float[]{0.5f, 0.5f, 0.5f}, context);
+            monsterball = new MonsterBallObject(context);
 
             //****pika****//
             pikaBody = new DrawableObject(R.raw.pikachufixed, new float[]{1, 1, 0}, context);
@@ -250,17 +221,21 @@ public class HandleScene {
             pikaTail = new DrawableObject(R.raw.pikachufixedtail, new float[]{184f / 255f, 134f / 255f, 11f / 255f}, context);
 
             //****wall****//
-            wallBase = new DrawableObject(R.raw.wallbase, new float[]{0.8f, 0.8f, 0.8f}, context);
-            wallBrick = new DrawableObject(R.raw.wallbrick, new float[]{178f / 255f, 34 / 255f, 34 / 255f}, context);
+            brickWall = ObstacleObject.create(0, R.raw.wallbase, new float[]{0.8f, 0.8f, 0.8f}, context);
+            brickWall.addModels(R.raw.wallbrick, new float[]{178f / 255f, 34 / 255f, 34 / 255f}, context);
+            brickWall.setPositon(new Vector3d(0, 150, 0));
 
             //****tree****//
             treeBase = new DrawableObject(R.raw.tbase, new float[]{184f / 255f * 0.05f, 134f / 255f * 0.05f, 11f / 255f * 0.05f}, context);
             treeLeaf = new DrawableObject(R.raw.tleaf, new float[]{0, 0.05f, 0}, context);
 
-            if (ballHShellButton.isLoaded() && ballHShellButtonBase.isLoaded() && ballHShellRing.isLoaded()
-                    && ballHShellRing1.isLoaded() && ballHShellTop.isLoaded() && ballHShellTop1.isLoaded()
+            fc = new FlyingCalculator(200);
+            fc.setMonsterBall(monsterball);
+            fc.addObstacle(brickWall);
+
+            if (monsterball.isLoaded()
                     && pikaTail.isLoaded() && pikaEarR.isLoaded() && pikaEarL.isLoaded() && pikaBody.isLoaded()
-                    && wallBrick.isLoaded() && wallBase.isLoaded()
+                    && brickWall.isLoaded()
                     && treeBase.isLoaded() && treeLeaf.isLoaded()) {
                 MODEL_LOADED = true;
             }

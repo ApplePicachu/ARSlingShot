@@ -17,6 +17,7 @@ import javax.vecmath.Vector3d;
 
 public class DrawableObject {
     protected double mass;
+
     protected Vector3d positon;
     protected Matrix3d attitude;
     protected Matrix4d transMatrix;
@@ -119,6 +120,10 @@ public class DrawableObject {
 
     public Vector3d getPositon() {
         return positon;
+    }
+
+    public float[] getPositonf() {
+        return new float[]{(float) positon.getX(), (float) positon.getY(), (float) positon.getZ()};
     }
 
     public void setPositon(Vector3d positon) {
