@@ -62,4 +62,7 @@ public class MonsterBallObject extends MovingObject {
         ballHShellTop1.draw(gl);
         ballHShellRing1.draw(gl);
     }
+    public void setMonsterBallOpen(float percentage){
+
+    }
 }

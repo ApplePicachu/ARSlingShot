@@ -2,6 +2,8 @@ package com.example.miles.slingshot3d.FlyingCalculator;
 
 import android.content.Context;
 
+import com.example.miles.slingshot3d.R;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,6 +20,7 @@ public class ObstacleObject extends DrawableObject {
     public static final int OBSTACLE_TYPE_WALL = 0;
     public static final int OBSTACLE_TYPE_BOOSTER = 1;
     public static final int OBSTACLE_TYPE_BREAK = 2;
+    public static final int OBSTACLE_TYPE_GROUND = 3;
     private int obstacleType;
     private double velocityChangeRate = 1.0;
     private List<ContactFace> contactFaces;
@@ -53,6 +56,9 @@ public class ObstacleObject extends DrawableObject {
                         break;
                     case OBSTACLE_TYPE_BREAK:
                         handleBreak(target);
+                        break;
+                    case OBSTACLE_TYPE_GROUND:
+                        handleVanish(target);
                         break;
                     default:
                         break;
@@ -91,17 +97,25 @@ public class ObstacleObject extends DrawableObject {
     private void handleBreak(MovingObject target) {
         target.getVelocity().scale(velocityChangeRate);
     }
-
-    public static ObstacleObject create(int type, int fileID, float[] inColor, Context ctx) {
+    private void handleVanish(MovingObject target){
+        target.getPositon().set(-999, -999, -999);
+        target.getVelocity().set(0, 0, 0);
+    }
+    public static ObstacleObject create(int type, Vector3d position, Context ctx) {
         ObstacleObject obstacleObject = null;
         switch (type) {
             case OBSTACLE_TYPE_WALL:
-                obstacleObject = new ObstacleObject(OBSTACLE_TYPE_WALL, fileID, inColor, ctx);
-                // obstacleObject.?? // set 3d model into obstacleObject
-                ContactFace contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, -1, 0), new Vector3d(0, 0, 1), 100, 100, false);
+                obstacleObject = new ObstacleObject(OBSTACLE_TYPE_WALL, R.raw.wallbase, new float[]{0.8f, 0.8f, 0.8f}, ctx);
+                obstacleObject.addModels(R.raw.wallbrick, new float[]{178f / 255f, 34 / 255f, 34 / 255f}, ctx);
+                obstacleObject.setPositon(position);
+                ContactFace contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, -1, 0), new Vector3d(0, 0, 1), 40.5, 48, false);
                 obstacleObject.setContactFace(contactFace);
                 break;
-
+            case OBSTACLE_TYPE_GROUND:
+                obstacleObject = new ObstacleObject(OBSTACLE_TYPE_GROUND, R.raw.wallbase, new float[]{0.8f, 0.8f, 0.8f}, ctx);
+                obstacleObject.setPositon(position);
+                contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, 0, 1), new Vector3d(1, 0, 0), 405, 480, false);
+                obstacleObject.setContactFace(contactFace);
             default:
                 break;
         }

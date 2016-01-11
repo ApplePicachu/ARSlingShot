@@ -1,6 +1,11 @@
 package com.example.miles.slingshot3d.FlyingCalculator;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+
+import javax.vecmath.Point3f;
+import javax.vecmath.Vector3d;
 
 public class FlyingCalculator {
     protected double timeInc;
@@ -9,6 +14,8 @@ public class FlyingCalculator {
     private LinkedList<MovingObject> objects;
     private LinkedList<ObstacleObject> obstacles;
     private double gravityAddition;
+    private boolean isTouchGround = false;
+    private final Vector3d noVelocity;
 
     public FlyingCalculator(MovingObject object, int timeIncMS) {
         this(timeIncMS);
@@ -20,7 +27,7 @@ public class FlyingCalculator {
         this.objects = new LinkedList<MovingObject>();
         this.obstacles = new LinkedList<ObstacleObject>();
         this.gravityAddition = GRAVITY * this.timeInc;
-
+        this.noVelocity = new Vector3d(0,0,0);
     }
 
     public void setMonsterBall(MonsterBallObject monsterBall) {
@@ -37,6 +44,10 @@ public class FlyingCalculator {
 
     public void nextFrame() {
         if (monsterBallObject != null) {
+            if (monsterBallObject.getVelocity().equals(noVelocity)){
+                isTouchGround = true;
+                return;
+            }
             monsterBallObject.getVelocity().z += gravityAddition;
 
             monsterBallObject.getPositon().x += monsterBallObject.getVelocity().x * timeInc;
@@ -46,7 +57,20 @@ public class FlyingCalculator {
             handleObstacle();
         }
     }
+    public float[] getFlyingRoute(Vector3d velocity, int maxCount){
+        List<Point3f> points = new ArrayList<Point3f>(maxCount);
 
+        //TODO
+
+        float[] result = new float[points.size()*3];
+        return result;
+    }
+    public boolean isTouchGround(){
+        return isTouchGround;
+    }
+    public void setIsTouchGround(boolean isTouchGround){
+        this.isTouchGround = isTouchGround;
+    }
     public void handleObstacle() {
         if (monsterBallObject != null) {
             for (ObstacleObject obstableObject : obstacles) {
