@@ -230,33 +230,33 @@ public class HandleScene {
                     }
                     break;
                     case 1: {
-                        brickWall1.setPositon(new Vector3d(0, 300, -90 + 70));
-                        brickWall2.setPositon(new Vector3d(0, 400, -90 + 150));
-                        Matrix3d matrix3d = new Matrix3d();
-                        matrix3d.setIdentity();
-                        matrix3d.rotX(Math.PI / 4);
-                        matrix3d.mul(2.0);
-                        brickWall2.setAttitude(matrix3d);
-
-                        angle1 = 0;
-                        angle2 = 45f;
-                        scale1 = 1;
-                        scale2 = 2;
+//                        brickWall1.setPositon(new Vector3d(0, 300, -90 + 70));
+//                        brickWall2.setPositon(new Vector3d(0, 400, -90 + 150));
+//                        Matrix3d matrix3d = new Matrix3d();
+//                        matrix3d.setIdentity();
+//                        matrix3d.rotX(Math.PI / 4);
+//                        matrix3d.mul(2.0);
+//                        brickWall2.setAttitude(matrix3d);
+//
+//                        angle1 = 0;
+//                        angle2 = 45f;
+//                        scale1 = 1;
+//                        scale2 = 2;
                     }
                     break;
                     case 2: {
-                        brickWall1.setPositon(new Vector3d(-21, 300, -90 + 70));
-                        brickWall2.setPositon(new Vector3d(21, 300, -90 + 70));
-                        Matrix3d matrix3d = new Matrix3d();
-                        matrix3d.setIdentity();
-                        matrix3d.rotX(-Math.PI / 4);
-                        matrix3d.mul(2.0);
-                        brickWall2.setAttitude(matrix3d);
-
-                        angle1 = 0;
-                        angle2 = 0;
-                        scale1 = 1;
-                        scale2 = 1;
+//                        brickWall1.setPositon(new Vector3d(-21, 300, -90 + 70));
+//                        brickWall2.setPositon(new Vector3d(21, 300, -90 + 70));
+//                        Matrix3d matrix3d = new Matrix3d();
+//                        matrix3d.setIdentity();
+//                        matrix3d.rotX(-Math.PI / 4);
+//                        matrix3d.mul(2.0);
+//                        brickWall2.setAttitude(matrix3d);
+//
+//                        angle1 = 0;
+//                        angle2 = 0;
+//                        scale1 = 1;
+//                        scale2 = 1;
                     }
                     break;
                     case 3: {
