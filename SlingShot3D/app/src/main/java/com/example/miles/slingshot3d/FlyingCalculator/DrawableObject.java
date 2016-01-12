@@ -96,14 +96,15 @@ public class DrawableObject {
     public Matrix4d getTransMatrix() {
         transMatrix.setIdentity();
         transMatrix.setRotation(attitude);
-        transMatrix.setTranslation(positon);
+        Matrix4d tmp = new Matrix4d();
+        tmp.setIdentity();
+        tmp.setTranslation(positon);
+        transMatrix.add(tmp);
         return transMatrix;
     }
 
     public float[] getTransMatrixf() {
-        transMatrix.setIdentity();
-        transMatrix.setRotation(attitude);
-        transMatrix.setTranslation(positon);
+        Matrix4d transMatrix = getTransMatrix();
 
         return new float[]{
                 (float) transMatrix.m00, (float) transMatrix.m10, (float) transMatrix.m20, (float) transMatrix.m30,
@@ -127,14 +128,15 @@ public class DrawableObject {
     }
 
     public void setPositon(Vector3d positon) {
-        this.positon = positon;
+        this.positon = new Vector3d(positon);
     }
 
     public void setAttitude(Matrix3d attitude) {
-        this.attitude = attitude;
+        this.attitude = new Matrix3d(attitude);
     }
 
     public void draw(GL10 gl) {
+
 
         gl.glColorPointer(4, gl.GL_FLOAT, 0, colorBuffer);
         gl.glVertexPointer(3, gl.GL_FLOAT, 0, vertexBuffer);
@@ -144,7 +146,10 @@ public class DrawableObject {
         gl.glEnableClientState(gl.GL_VERTEX_ARRAY);
         gl.glEnableClientState(gl.GL_NORMAL_ARRAY);
 
+        gl.glPushMatrix();
+        gl.glMultMatrixf(this.getTransMatrixf(), 0);
         gl.glDrawArrays(gl.GL_TRIANGLES, 0, vertex.length / 3);
+        gl.glPopMatrix();
 
         gl.glDisableClientState(gl.GL_COLOR_ARRAY);
         gl.glDisableClientState(gl.GL_VERTEX_ARRAY);

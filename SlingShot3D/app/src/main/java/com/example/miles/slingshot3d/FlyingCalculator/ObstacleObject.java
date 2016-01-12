@@ -37,6 +37,9 @@ public class ObstacleObject extends DrawableObject {
     public void addModels(int fileID, float[] inColor, Context ctx) {
         models.add(new DrawableObject(fileID, inColor, ctx));
     }
+    public int getObstacleType(){
+        return this.obstacleType;
+    }
 
     public void setContactFace(ContactFace contactFace) {
         contactFaces.add(contactFace);
@@ -69,8 +72,11 @@ public class ObstacleObject extends DrawableObject {
 
     private void handleMonsterBallBounce(MonsterBallObject target, Vector3d contactVector) {
         Vector3d targetVelocity = target.getVelocity();
+        Vector3d targetPosition = target.getPositon();
+        target.getPositon().set(targetPosition.getX()-targetVelocity.getX()*0.15, targetPosition.getY()-targetVelocity.getY()*0.15, targetPosition.getZ()-targetVelocity.getZ()*0.15);
         double bounceAngle = targetVelocity.angle(contactVector);
 //		System.out.println("bounceAngle:" + bounceAngle);
+        // vertical shoot in
         if (round(bounceAngle, 3) == round(Math.PI, 3)) {
             target.getVelocity().scale(-1);
             return;
@@ -110,11 +116,12 @@ public class ObstacleObject extends DrawableObject {
                 obstacleObject.setPositon(position);
                 ContactFace contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, -1, 0), new Vector3d(0, 0, 1), 40.5, 48, false);
                 obstacleObject.setContactFace(contactFace);
+
                 break;
             case OBSTACLE_TYPE_GROUND:
                 obstacleObject = new ObstacleObject(OBSTACLE_TYPE_GROUND, R.raw.wallbase, new float[]{0.8f, 0.8f, 0.8f}, ctx);
                 obstacleObject.setPositon(position);
-                contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, 0, 1), new Vector3d(1, 0, 0), 405, 480, false);
+                contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, 0, 1), new Vector3d(1, 0, 0), 40.5, 48, false);
                 obstacleObject.setContactFace(contactFace);
             default:
                 break;

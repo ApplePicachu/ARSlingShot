@@ -20,6 +20,8 @@ public class MonsterBallObject extends MovingObject {
     private DrawableObject ballHShellButtonBase;
     private DrawableObject ballHShellButton;
 
+    private float openAngle = 0;
+
     public MonsterBallObject(Context context) {
         super(R.raw.pocketmonballshelltop, new float[]{1, 1, 1}, context);
         ballHShellRing = new DrawableObject(R.raw.pocketmonballshellring, new float[]{0, 0, 0}, context);
@@ -55,14 +57,24 @@ public class MonsterBallObject extends MovingObject {
     public void draw(GL10 gl) {
         super.draw(gl);
         ballHShellRing.draw(gl);
-        ballHShellButton.draw(gl);
-        ballHShellButtonBase.draw(gl);
 
         gl.glRotatef(180, 0, 1, 0);
+        gl.glTranslatef(0, -30, 0);
+        gl.glRotatef(openAngle, -1, 0, 0);
+        gl.glTranslatef(0, 30, 0);
+        ballHShellButton.draw(gl);
+        ballHShellButtonBase.draw(gl);
         ballHShellTop1.draw(gl);
         ballHShellRing1.draw(gl);
     }
-    public void setMonsterBallOpen(float percentage){
 
+    public void setMonsterBallOpen(float timer) {
+        openAngle = timer*2.0f;
+        if(openAngle>75){
+            openAngle = 75-(openAngle-75);
+            if(openAngle<0){
+                openAngle = 0;
+            }
+        }
     }
 }

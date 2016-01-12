@@ -14,11 +14,13 @@ import com.example.miles.slingshot3d.TestModels.ColorCube;
 import com.example.miles.slingshot3d.TestModels.ColorLine;
 
 import javax.microedition.khronos.opengles.GL10;
+import javax.vecmath.Matrix3d;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 public class HandleScene {
+    private static float SLING_SHOT_HEIGHT = 90.0f;
     private float[] projectileM;
     private float[] baseM;
     private boolean isArmed = false;
@@ -39,6 +41,7 @@ public class HandleScene {
 
     //****ball****//
     private MonsterBallObject monsterball;
+    private float openTimer = 0;
 
     //****pika****//
     private DrawableObject pikaBody;
@@ -49,7 +52,15 @@ public class HandleScene {
     private Point3f picaPosition;
 
     //****wall****//
-    private ObstacleObject brickWall;
+    private ObstacleObject brickWall1;
+    private ObstacleObject brickWall2;
+
+    private float angle1 = 0;
+    private float angle2 = 0;
+    private float scale1 = 1;
+    private float scale2 = 1;
+
+    //****ground****//
     private ObstacleObject ground;
 
     //****tree****//
@@ -64,6 +75,8 @@ public class HandleScene {
 
     private float[] launchLocMatrix = new float[16];
     private boolean isCaptured = false;
+    private int gameState = 0;
+    private boolean STATE_CHANGING = false;
 
     public HandleScene(Context ctx) {
         baseM = new float[16];
@@ -79,7 +92,7 @@ public class HandleScene {
         loadSTL.start();
 
         shootingDirection = new Vector3f();
-        picaPosition = new Point3f(0, 200, -80);
+        picaPosition = new Point3f(0, 380, -80);
     }
 
     public void setBaseM(float[] baseM) {
@@ -116,87 +129,146 @@ public class HandleScene {
     }
 
     public void draw(GL10 gl) {
-        time.setToNow();
-        if ((time.toMillis(false) - startFlyingTime > 3000) | fc.isTouchGround()) {
-            isReady = true;
-            launchLocMatrix = new float[16];
-        }
-        if (time.toMillis(false)-captureTimer > 1000){
-            isCaptured = false;
-        }
-        calcShootingVector();
-        if (isNoBaseM) {
-            noBaseMCounter++;
-        }
-        if (isNoProjectileM) {
-            noProjectileMCounter++;
-            if (noProjectileMCounter > 3) {
-                if (isArmed) {
-                    // shooting process
-                    time.setToNow();
-                    startFlyingTime = time.toMillis(false);
-                    isReady = false;
-                    isArmed = false;
-                    fc.setIsTouchGround(false);
-                    Log.e("object velocity", shootingDirection.x + " " + shootingDirection.y + " " + shootingDirection.z + " ");
-                    monsterball.setPositon(new Vector3d());
-                    monsterball.setVelocity(new Vector3d(shootingDirection.x, shootingDirection.y, shootingDirection.z));
-                    launchLocMatrix = baseM;
+        if (MODEL_LOADED) {
+            //States
+            time.setToNow();
+            if ((time.toMillis(false) - startFlyingTime > 3000) | fc.isTouchGround()) {
+                isReady = true;
+                launchLocMatrix = new float[16];
+            }
+            if (time.toMillis(false) - captureTimer > 3000 && isCaptured) {
+                //switching game state
+                gameState = (gameState + 1) % 4;
+                STATE_CHANGING = true;
+                isCaptured = false;
+                openTimer = 0;
+                monsterball.setMonsterBallOpen(0);
+            }
+
+            calcShootingVector();
+            if (isNoBaseM) {
+                noBaseMCounter++;
+            }
+
+            if (isNoProjectileM) {
+                noProjectileMCounter++;
+                if (noProjectileMCounter > 3) {
+                    if (isArmed) {
+                        // shooting process
+                        time.setToNow();
+                        startFlyingTime = time.toMillis(false);
+                        isReady = false;
+                        isArmed = false;
+                        fc.setIsTouchGround(false);
+                        Log.e("object velocity", shootingDirection.x + " " + shootingDirection.y + " " + shootingDirection.z + " ");
+                        monsterball.setPositon(new Vector3d());
+                        monsterball.setVelocity(new Vector3d(shootingDirection.x, shootingDirection.y, shootingDirection.z));
+                        launchLocMatrix = baseM;
+                    }
                 }
             }
-        }
-        isNoBaseM = true;
-        isNoProjectileM = true;
+            isNoBaseM = true;
+            isNoProjectileM = true;
 
-        gl.glMatrixMode(GL10.GL_MODELVIEW);
-        if (!isReady) {
-            //flying
-            fc.nextFrame();
-
-            float captureDistance = new Point3f(monsterball.getPositon()).distance(new Point3f(picaPosition.x, picaPosition.y, picaPosition.z+40));
-            Log.d("flying", "captureDistance="+captureDistance);
-            if (captureDistance < 80)
-                monsterball.setMonsterBallOpen(-2*captureDistance+160);//range 80~30 to 0~100
-            if (captureDistance < 30) {
-                time.setToNow();
-                captureTimer = time.toMillis(false);
-                isCaptured = true;
-            }
+            gl.glMatrixMode(GL10.GL_MODELVIEW);
             gl.glLoadMatrixf(baseM, 0);
-            gl.glMultMatrixf(monsterball.getTransMatrixf(), 0);
-            monsterball.draw(gl);
-            Log.e("Ready", "shoot");
-        }
-        gl.glLoadMatrixf(baseM, 0);
-        line.draw(gl);
-
-        if (MODEL_LOADED) {
-            float[] temp = ground.getPositonf();
-            gl.glLoadMatrixf(baseM, 0);
-            gl.glTranslatef(temp[0], temp[1], temp[2]);
-            gl.glScalef(10.0f, 10.0f, 10.0f);
             ground.draw(gl);
+            brickWall1.draw(gl);
+            brickWall2.draw(gl);
+            drawTree(gl);
+            if (isReady) {
+                //not shooting yet
+                monsterball.setPositon(new Vector3d());
+                gl.glLoadMatrixf(projectileM, 0);
+                monsterball.draw(gl);
+            } else if (isCaptured) {
+                monsterball.setPositon(new Vector3d(50, 380, -90 + 50));
+                openTimer++;
+                monsterball.setMonsterBallOpen(openTimer);
 
-            temp = brickWall.getPositonf();
+                gl.glLoadMatrixf(baseM, 0);
+                gl.glRotatef(35, -1, 0, 1);
+                monsterball.draw(gl);
+
+                gl.glLoadMatrixf(baseM, 0);
+                gl.glTranslatef(+35.0f / (90.0f - openTimer + 0.1f), -30 / (90.0f - openTimer + 0.1f), +35 / (90.0f - openTimer + 0.1f));
+                drawPIKA(gl, 8 / openTimer * 4);
+            } else {
+                //flying
+                fc.nextFrame();
+                float captureDistance = new Point3f(monsterball.getPositon()).distance(new Point3f(picaPosition.x, picaPosition.y, picaPosition.z + 40));
+//                Log.d("flying", "captureDistance=" + captureDistance);
+                if (captureDistance < 30) {
+                    time.setToNow();
+                    captureTimer = time.toMillis(false);
+                    isCaptured = true;
+                    monsterball.setPositon(new Vector3d(35, 350, -90 + 35));
+                }
+                gl.glLoadMatrixf(baseM, 0);
+                monsterball.draw(gl);
+                Log.e("Ready", "shoot");
+            }
+
             gl.glLoadMatrixf(baseM, 0);
-            gl.glTranslatef(temp[0], temp[1], temp[2]);
-            gl.glRotatef(90, 1, 0, 0);
-            brickWall.draw(gl);
+            line.draw(gl);
 
             if (!isCaptured) {
                 gl.glLoadMatrixf(baseM, 0);
-                drawPIKA(gl);
+                drawPIKA(gl, 8);
             }
 
+            //game state switching
+            if (STATE_CHANGING) {
+                switch (gameState) {
+                    case 0: {
+                        brickWall1.setPositon(new Vector3d(0, 200, -90 + 24));
+                        brickWall2.setPositon(new Vector3d(0, 200, -90 + 24 + 10000));
+                        angle1 = 0;
+                        angle2 = 0;
+                        scale1 = 1;
+                        scale2 = 1;
+                    }
+                    break;
+                    case 1: {
+                        brickWall1.setPositon(new Vector3d(0, 300, -90 + 70));
+                        brickWall2.setPositon(new Vector3d(0, 400, -90 + 150));
+                        Matrix3d matrix3d = new Matrix3d();
+                        matrix3d.setIdentity();
+                        matrix3d.rotX(Math.PI / 4);
+                        matrix3d.mul(2.0);
+                        brickWall2.setAttitude(matrix3d);
 
-            gl.glLoadMatrixf(baseM, 0);
-            drawTree(gl);
-        }
-        if (MODEL_LOADED && isReady) {
-            gl.glLoadMatrixf(projectileM, 0);
-            monsterball.draw(gl);
+                        angle1 = 0;
+                        angle2 = 45f;
+                        scale1 = 1;
+                        scale2 = 2;
+                    }
+                    break;
+                    case 2: {
+                        brickWall1.setPositon(new Vector3d(-21, 300, -90 + 70));
+                        brickWall2.setPositon(new Vector3d(21, 300, -90 + 70));
+                        Matrix3d matrix3d = new Matrix3d();
+                        matrix3d.setIdentity();
+                        matrix3d.rotX(-Math.PI / 4);
+                        matrix3d.mul(2.0);
+                        brickWall2.setAttitude(matrix3d);
+
+                        angle1 = 0;
+                        angle2 = 0;
+                        scale1 = 1;
+                        scale2 = 1;
+                    }
+                    break;
+                    case 3: {
+                        Log.e("flying", "Win");
+                    }
+                    break;
+                }
+                STATE_CHANGING = false;
+            }
         }
     }
+
 
     private void calcShootingVector() {
         float[] pointBase = new float[4];
@@ -217,15 +289,23 @@ public class HandleScene {
         shootingDirection.x = -pointProjectile[0];
         shootingDirection.y = -pointProjectile[1];
         shootingDirection.z = -pointProjectile[2];
-        float h = 120.0f - (shootingDirection.length() - ARM_THRESHOLD) * 120.0f / 40.0f;
+        float h = 120.0f - (shootingDirection.length() - ARM_THRESHOLD) * 100.0f / 40.0f;
         float[] hsv = {h, 1.0f, 1.0f};
         line.setLine(pointBase, pointProjectile);
         line.setColor(Color.GREEN, Color.HSVToColor(255, hsv));
     }
 
-    private void drawPIKA(GL10 gl) {
+    private void drawWall(GL10 gl, ObstacleObject wall, float scale, float angle) {
+        gl.glLoadMatrixf(baseM, 0);
+        gl.glTranslatef(wall.getPositonf()[0], wall.getPositonf()[1], wall.getPositonf()[2]);
+        gl.glScalef(scale, scale, scale);
+        gl.glRotatef(90 + angle, 1, 0, 0);
+        wall.draw(gl);
+    }
+
+    private void drawPIKA(GL10 gl, float scale) {
         gl.glTranslatef(picaPosition.x, picaPosition.y, picaPosition.z);
-        gl.glScalef(8.0f, 8.0f, 8.0f);
+        gl.glScalef(scale, scale, scale);
         pikaBody.draw(gl);
         pikaNose.draw(gl);
         pikaEarL.draw(gl);
@@ -234,7 +314,7 @@ public class HandleScene {
     }
 
     private void drawTree(GL10 gl) {
-        gl.glTranslatef(-80.0f, 80.0f, 0);
+        gl.glTranslatef(80.0f, 80.0f, 0);
         gl.glRotatef(90, 1, 0, 0);
         gl.glScalef(0.05f, 0.05f, 0.05f);
         treeBase.draw(gl);
@@ -256,23 +336,38 @@ public class HandleScene {
             pikaTail = new DrawableObject(R.raw.pikachufixedtail, new float[]{184f / 255f, 134f / 255f, 11f / 255f}, context);
 
             //****wall****//
-            brickWall = ObstacleObject.create(0, new Vector3d(0, 400, -90 + 24), context);
+            brickWall1 = ObstacleObject.create(ObstacleObject.OBSTACLE_TYPE_WALL, new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 24), context);
+            Matrix3d matrix3d = new Matrix3d();
+            matrix3d.setIdentity();
+            matrix3d.rotX(Math.PI / 2);
+            brickWall1.setAttitude(matrix3d);
+
+            brickWall2 = ObstacleObject.create(ObstacleObject.OBSTACLE_TYPE_WALL, new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 24 + 10000), context);
+            matrix3d = new Matrix3d();
+            matrix3d.setIdentity();
+            matrix3d.rotX(Math.PI / 2);
+            brickWall2.setAttitude(matrix3d);
 
             //****ground****//
-            ground = ObstacleObject.create(3, new Vector3d(0, 200, -90 - 5), context);
+            ground = ObstacleObject.create(ObstacleObject.OBSTACLE_TYPE_GROUND, new Vector3d(0, 200, -SLING_SHOT_HEIGHT - 10), context);
+            matrix3d = new Matrix3d();
+            matrix3d.setIdentity();
+            matrix3d.mul(10.0);
+            ground.setAttitude(matrix3d);
 
             //****tree****//
             treeBase = new DrawableObject(R.raw.tbase, new float[]{184f / 255f * 0.05f, 134f / 255f * 0.05f, 11f / 255f * 0.05f}, context);
             treeLeaf = new DrawableObject(R.raw.tleaf, new float[]{0, 0.05f, 0}, context);
 
-            fc = new FlyingCalculator(200);
+            fc = new FlyingCalculator(150);
             fc.setMonsterBall(monsterball);
-            fc.addObstacle(brickWall);
+            fc.addObstacle(brickWall1);
+            fc.addObstacle(brickWall2);
             fc.addObstacle(ground);
 
             if (monsterball.isLoaded()
                     && pikaTail.isLoaded() && pikaEarR.isLoaded() && pikaEarL.isLoaded() && pikaBody.isLoaded()
-                    && brickWall.isLoaded()
+                    && brickWall1.isLoaded()
                     && treeBase.isLoaded() && treeLeaf.isLoaded()) {
                 MODEL_LOADED = true;
             }

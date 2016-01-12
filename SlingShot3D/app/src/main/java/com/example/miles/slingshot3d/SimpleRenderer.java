@@ -64,60 +64,61 @@ import javax.microedition.khronos.opengles.GL10;
  * A very simple Renderer that adds a marker and draws a cube on it.
  */
 public class SimpleRenderer extends ARRenderer {
-	private int markerIDs[] = {-1, -1};
-	private HandleScene handleScene;
-	private float[] ambientLight = new float[]{0.25f, 0.25f, 0.25f, 1.0f};
-	private float[] diffuseLight = new float[]{0.85f, 0.85f, 0.85f, 1.0f};
-	private float[] lightPos = new float[]{0.0f, 200.0f, 200.0f, 1.0f};
+    private int markerIDs[] = {-1, -1};
+    private HandleScene handleScene;
+    private float[] ambientLight = new float[]{0.25f, 0.25f, 0.25f, 1.0f};
+    private float[] diffuseLight = new float[]{0.85f, 0.85f, 0.85f, 1.0f};
+    private float[] lightPos = new float[]{0.0f, 200.0f, 200.0f, 1.0f};
 
-	private FloatBuffer ambientBuffer;
-	private FloatBuffer diffuseBuffer;
-	private FloatBuffer lightPosBuffer;
+    private FloatBuffer ambientBuffer;
+    private FloatBuffer diffuseBuffer;
+    private FloatBuffer lightPosBuffer;
+    private boolean[] twoMarker = new boolean[]{false, false};
 
-	public SimpleRenderer(Context ctx) {
-		ambientBuffer = RenderUtils.buildFloatBuffer(ambientLight);
-		diffuseBuffer = RenderUtils.buildFloatBuffer(diffuseLight);
-		lightPosBuffer = RenderUtils.buildFloatBuffer(lightPos);
-		handleScene = new HandleScene(ctx);
-	}
+    public SimpleRenderer(Context ctx) {
+        ambientBuffer = RenderUtils.buildFloatBuffer(ambientLight);
+        diffuseBuffer = RenderUtils.buildFloatBuffer(diffuseLight);
+        lightPosBuffer = RenderUtils.buildFloatBuffer(lightPos);
+        handleScene = new HandleScene(ctx);
+    }
 
-	/**
-	 * Markers can be configured here.
-	 */
-	@Override
-	public boolean configureARScene() {
-		markerIDs[0] =  ARToolKit.getInstance().addMarker("multi;Data/multiMarkerField.pat");
-		markerIDs[1] =  ARToolKit.getInstance().addMarker("multi;Data/multiMarkerSlingshot.pat");
-		for (int i = 0; i < markerIDs.length; i++) {
-			if (markerIDs[i] < 0) {
-				return false;
-			}
-		}
-		return true;
-	}
+    /**
+     * Markers can be configured here.
+     */
+    @Override
+    public boolean configureARScene() {
+        markerIDs[0] = ARToolKit.getInstance().addMarker("multi;Data/multiMarkerField.pat");
+        markerIDs[1] = ARToolKit.getInstance().addMarker("multi;Data/multiMarkerSlingshot.pat");
+        for (int i = 0; i < markerIDs.length; i++) {
+            if (markerIDs[i] < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 
-	@Override
-	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-		super.onSurfaceCreated(gl, config);
-		gl.glLightfv(gl.GL_LIGHT0, gl.GL_AMBIENT, ambientBuffer);
-		gl.glLightfv(gl.GL_LIGHT0, gl.GL_DIFFUSE, diffuseBuffer);
-		gl.glLightfv(gl.GL_LIGHT0, gl.GL_POSITION, lightPosBuffer);
-		gl.glEnable(gl.GL_LIGHT0);
-		gl.glEnable(gl.GL_COLOR_MATERIAL);
+    @Override
+    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        super.onSurfaceCreated(gl, config);
+        gl.glLightfv(gl.GL_LIGHT0, gl.GL_AMBIENT, ambientBuffer);
+        gl.glLightfv(gl.GL_LIGHT0, gl.GL_DIFFUSE, diffuseBuffer);
+        gl.glLightfv(gl.GL_LIGHT0, gl.GL_POSITION, lightPosBuffer);
+        gl.glEnable(gl.GL_LIGHT0);
+        gl.glEnable(gl.GL_COLOR_MATERIAL);
         gl.glEnable(gl.GL_LIGHTING);
-	}
+    }
 
 
-	/**
-	 * Override the draw function from ARRenderer.
-	 */
-	@Override
-	public void draw(GL10 gl) {
+    /**
+     * Override the draw function from ARRenderer.
+     */
+    @Override
+    public void draw(GL10 gl) {
 
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-		// Apply the ARToolKit projection matrix
+        // Apply the ARToolKit projection matrix
         gl.glMatrixMode(GL10.GL_PROJECTION);
         gl.glLoadMatrixf(ARToolKit.getInstance().getProjectionMatrix(), 0);
 
@@ -126,16 +127,19 @@ public class SimpleRenderer extends ARRenderer {
         gl.glEnable(GL10.GL_DEPTH_TEST);
         gl.glFrontFace(GL10.GL_CCW);
 
-		// If the marker is visible, apply its transformation, and draw a cube
-    	if (ARToolKit.getInstance().queryMarkerVisible(markerIDs[0])) {
-			handleScene.setBaseM(ARToolKit.getInstance().queryMarkerTransformation(markerIDs[0]));
-		}
-    	if (ARToolKit.getInstance().queryMarkerVisible(markerIDs[1])) {
-			handleScene.setProjectileM(ARToolKit.getInstance().queryMarkerTransformation(markerIDs[1]));
-		}
-    	
-    	handleScene.draw(gl);
-	}
+        // If the marker is visible, apply its transformation, and draw a cube
+        if (ARToolKit.getInstance().queryMarkerVisible(markerIDs[0])) {
+            handleScene.setBaseM(ARToolKit.getInstance().queryMarkerTransformation(markerIDs[0]));
+            twoMarker[0] = true;
+        }
+        if (ARToolKit.getInstance().queryMarkerVisible(markerIDs[1])) {
+            handleScene.setProjectileM(ARToolKit.getInstance().queryMarkerTransformation(markerIDs[1]));
+            twoMarker[1] = true;
+        }
+        if (twoMarker[0] && twoMarker[1]) {
+            handleScene.draw(gl);
+        }
+    }
 
 
 }
