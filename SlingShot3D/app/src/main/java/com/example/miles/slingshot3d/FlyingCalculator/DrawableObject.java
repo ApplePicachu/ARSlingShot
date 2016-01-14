@@ -94,6 +94,7 @@ public class DrawableObject {
     }
 
     public Matrix4d getTransMatrix() {
+
         transMatrix.setIdentity();
         transMatrix.setRotation(attitude);
         transMatrix.setTranslation(positon);

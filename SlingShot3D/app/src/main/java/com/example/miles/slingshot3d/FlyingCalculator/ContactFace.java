@@ -66,6 +66,7 @@ public class ContactFace {
     }
 
     public boolean isBallContact(Point3d ballCenter, double diameter, Matrix4d transMatrix) {
+
         Point3d contactFaceCenterTrans = new Point3d(contactFaceCenter);
         transMatrix.transform(contactFaceCenterTrans);
         Vector3d contactFaceFrontTrans = new Vector3d(contactFaceFront);
@@ -73,17 +74,19 @@ public class ContactFace {
         contactFaceFrontTrans.normalize();
 
         this.contactPoint = calcPlaneLineIntersectPoint(contactFaceFrontTrans, contactFaceCenterTrans, contactFaceFrontTrans, ballCenter);
+
         double ballFaceDistance = this.contactPoint.distance(ballCenter);
         if (ballFaceDistance <= diameter / 2) {
             contactVector = new Vector3d(ballCenter.x - contactPoint.x, ballCenter.y - contactPoint.y, ballCenter.z - contactPoint.z);
             contactVector.normalize();
+
             if (contactVector.dot(contactFaceFrontTrans) < 0 && !isTwoSide) { // is ball at back face
                 return false;
             }
             switch (contactFaceShape) {
                 case CONTACT_FACE_RECT:
                     Vector3d contactFaceUpTrans = new Vector3d(contactFaceUp);
-                    transMatrix.transform(contactFaceFrontTrans);
+                    transMatrix.transform(contactFaceUpTrans);
                     contactFaceUpTrans.normalize();
                     Vector3d contactFaceRightTrans = new Vector3d();
                     contactFaceRightTrans.cross(contactFaceUpTrans, contactVector);
@@ -91,9 +94,9 @@ public class ContactFace {
                     Vector3d contactPointVector = new Vector3d(contactPoint.x - contactFaceCenterTrans.x,
                             contactPoint.y - contactFaceCenterTrans.y,
                             contactPoint.z - contactFaceCenterTrans.z);
-
-                    if (Math.abs(contactPointVector.dot(contactFaceRightTrans)) <= contactFaceW / 2 &&
-                            Math.abs(contactPointVector.dot(contactFaceUpTrans)) <= contactFaceH / 2) {
+                    transMatrix.getScale();
+                    if (Math.abs(contactPointVector.dot(contactFaceRightTrans)) <= contactFaceW *transMatrix.getScale()/ 2 &&
+                            Math.abs(contactPointVector.dot(contactFaceUpTrans)) <= contactFaceH *transMatrix.getScale()/ 2) {
                         return true;
                     }
                 case CONTACT_FACE_CIRCLE:

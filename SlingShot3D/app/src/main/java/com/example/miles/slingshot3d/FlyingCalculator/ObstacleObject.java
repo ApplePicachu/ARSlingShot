@@ -59,7 +59,6 @@ public class ObstacleObject extends DrawableObject {
         Matrix4d transMatrix = getTransMatrix();
         for (ContactFace contactFace : contactFaces) {
             if (contactFace.getContactPosAndVec(target.getBallCenter(), target.getBallDiameter(), transMatrix)) {
-                //System.out.println("hit");
                 switch (obstacleType) {
                     case OBSTACLE_TYPE_WALL:
                         handleMonsterBallBounce(target, contactFace.getContactVector());
