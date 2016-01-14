@@ -55,11 +55,6 @@ public class HandleScene {
     private ObstacleObject brickWall1;
     private ObstacleObject brickWall2;
 
-    private float angle1 = 0;
-    private float angle2 = 0;
-    private float scale1 = 1;
-    private float scale2 = 1;
-
     //****ground****//
     private ObstacleObject ground;
 
@@ -187,7 +182,6 @@ public class HandleScene {
                 monsterball.setMonsterBallOpen(openTimer);
 
                 gl.glLoadMatrixf(baseM, 0);
-                gl.glRotatef(35, -1, 0, 1);
                 monsterball.draw(gl);
 
                 gl.glLoadMatrixf(baseM, 0);
@@ -221,42 +215,27 @@ public class HandleScene {
             if (STATE_CHANGING) {
                 switch (gameState) {
                     case 0: {
-                        brickWall1.setPositon(new Vector3d(0, 200, -90 + 24));
-                        brickWall2.setPositon(new Vector3d(0, 200, -90 + 24 + 10000));
-                        angle1 = 0;
-                        angle2 = 0;
-                        scale1 = 1;
-                        scale2 = 1;
+                        brickWall1.setPositon(new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 10000));
+                        brickWall2.setPositon(new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 10000));
                     }
                     break;
                     case 1: {
-//                        brickWall1.setPositon(new Vector3d(0, 300, -90 + 70));
-//                        brickWall2.setPositon(new Vector3d(0, 400, -90 + 150));
-//                        Matrix3d matrix3d = new Matrix3d();
-//                        matrix3d.setIdentity();
-//                        matrix3d.rotX(Math.PI / 4);
-//                        matrix3d.mul(2.0);
-//                        brickWall2.setAttitude(matrix3d);
-//
-//                        angle1 = 0;
-//                        angle2 = 45f;
-//                        scale1 = 1;
-//                        scale2 = 2;
+                        brickWall1.setPositon(new Vector3d(0, 300, -SLING_SHOT_HEIGHT + 70));
+                        brickWall2.setPositon(new Vector3d(0, 400, -SLING_SHOT_HEIGHT + 150));
+                        Matrix3d matrix3d = new Matrix3d();
+                        matrix3d.setIdentity();
+                        matrix3d.rotX(3*Math.PI / 4);
+                        matrix3d.mul(2.0);
+                        brickWall2.setAttitude(matrix3d);
                     }
                     break;
                     case 2: {
-//                        brickWall1.setPositon(new Vector3d(-21, 300, -90 + 70));
-//                        brickWall2.setPositon(new Vector3d(21, 300, -90 + 70));
-//                        Matrix3d matrix3d = new Matrix3d();
-//                        matrix3d.setIdentity();
-//                        matrix3d.rotX(-Math.PI / 4);
-//                        matrix3d.mul(2.0);
-//                        brickWall2.setAttitude(matrix3d);
-//
-//                        angle1 = 0;
-//                        angle2 = 0;
-//                        scale1 = 1;
-//                        scale2 = 1;
+                        brickWall1.setPositon(new Vector3d(-21, 300, -SLING_SHOT_HEIGHT + 70));
+                        brickWall2.setPositon(new Vector3d(21, 300, -SLING_SHOT_HEIGHT + 70));
+                        Matrix3d matrix3d = new Matrix3d();
+                        matrix3d.setIdentity();
+                        matrix3d.rotX(Math.PI / 4);
+                        brickWall2.setAttitude(matrix3d);
                     }
                     break;
                     case 3: {
@@ -336,13 +315,13 @@ public class HandleScene {
             pikaTail = new DrawableObject(R.raw.pikachufixedtail, new float[]{184f / 255f, 134f / 255f, 11f / 255f}, context);
 
             //****wall****//
-            brickWall1 = ObstacleObject.create(ObstacleObject.OBSTACLE_TYPE_WALL, new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 24), context);
+            brickWall1 = ObstacleObject.create(ObstacleObject.OBSTACLE_TYPE_WALL, new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 10000), context);
             Matrix3d matrix3d = new Matrix3d();
             matrix3d.setIdentity();
             matrix3d.rotX(Math.PI / 2);
             brickWall1.setAttitude(matrix3d);
 
-            brickWall2 = ObstacleObject.create(ObstacleObject.OBSTACLE_TYPE_WALL, new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 24 + 10000), context);
+            brickWall2 = ObstacleObject.create(ObstacleObject.OBSTACLE_TYPE_WALL, new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 10000), context);
             matrix3d = new Matrix3d();
             matrix3d.setIdentity();
             matrix3d.rotX(Math.PI / 2);

@@ -49,10 +49,12 @@ public class FlyingCalculator {
                 return;
             }
             monsterBallObject.getVelocity().z += gravityAddition;
+            Vector3d vector3d = new Vector3d(monsterBallObject.getPositon());
 
-            monsterBallObject.getPositon().x += monsterBallObject.getVelocity().x * timeInc;
-            monsterBallObject.getPositon().y += monsterBallObject.getVelocity().y * timeInc;
-            monsterBallObject.getPositon().z += monsterBallObject.getVelocity().z * timeInc;
+            vector3d.x += monsterBallObject.getVelocity().x * timeInc;
+            vector3d.y += monsterBallObject.getVelocity().y * timeInc;
+            vector3d.z += monsterBallObject.getVelocity().z * timeInc;
+            monsterBallObject.setPositon(vector3d);
 
             handleObstacle();
         }

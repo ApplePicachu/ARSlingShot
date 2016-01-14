@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
 import javax.vecmath.AxisAngle4d;
+import javax.vecmath.Matrix3d;
 import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
@@ -36,8 +37,17 @@ public class ObstacleObject extends DrawableObject {
 
     public void addModels(int fileID, float[] inColor, Context ctx) {
         models.add(new DrawableObject(fileID, inColor, ctx));
+
+        Matrix3d matrix3d = new Matrix3d(models.get(0).attitude);
+        Vector3d vector3d = new Vector3d(models.get(0).positon);
+
+        for (int i = 1; i < models.size(); i++) {
+            models.get(i).setPositon(vector3d);
+            models.get(i).setAttitude(matrix3d);
+        }
     }
-    public int getObstacleType(){
+
+    public int getObstacleType() {
         return this.obstacleType;
     }
 
@@ -73,7 +83,7 @@ public class ObstacleObject extends DrawableObject {
     private void handleMonsterBallBounce(MonsterBallObject target, Vector3d contactVector) {
         Vector3d targetVelocity = target.getVelocity();
         Vector3d targetPosition = target.getPositon();
-        target.getPositon().set(targetPosition.getX()-targetVelocity.getX()*0.15, targetPosition.getY()-targetVelocity.getY()*0.15, targetPosition.getZ()-targetVelocity.getZ()*0.15);
+        target.getPositon().set(targetPosition.getX() - targetVelocity.getX() * 0.15, targetPosition.getY() - targetVelocity.getY() * 0.15, targetPosition.getZ() - targetVelocity.getZ() * 0.15);
         double bounceAngle = targetVelocity.angle(contactVector);
 //		System.out.println("bounceAngle:" + bounceAngle);
         // vertical shoot in
@@ -103,10 +113,12 @@ public class ObstacleObject extends DrawableObject {
     private void handleBreak(MovingObject target) {
         target.getVelocity().scale(velocityChangeRate);
     }
-    private void handleVanish(MovingObject target){
-        target.getPositon().set(-999, -999, -999);
-        target.getVelocity().set(0, 0, 0);
+
+    private void handleVanish(MovingObject target) {
+        target.setPositon(new Vector3d(-999, -999, -999));
+        target.setVelocity(new Vector3d());
     }
+
     public static ObstacleObject create(int type, Vector3d position, Context ctx) {
         ObstacleObject obstacleObject = null;
         switch (type) {
@@ -114,14 +126,14 @@ public class ObstacleObject extends DrawableObject {
                 obstacleObject = new ObstacleObject(OBSTACLE_TYPE_WALL, R.raw.wallbase, new float[]{0.8f, 0.8f, 0.8f}, ctx);
                 obstacleObject.addModels(R.raw.wallbrick, new float[]{178f / 255f, 34 / 255f, 34 / 255f}, ctx);
                 obstacleObject.setPositon(position);
-                ContactFace contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, -1, 0), new Vector3d(0, 0, 1), 40.5, 48, false);
+                ContactFace contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 1, 0), 40.5, 48, false);
                 obstacleObject.setContactFace(contactFace);
 
                 break;
             case OBSTACLE_TYPE_GROUND:
                 obstacleObject = new ObstacleObject(OBSTACLE_TYPE_GROUND, R.raw.wallbase, new float[]{0.8f, 0.8f, 0.8f}, ctx);
                 obstacleObject.setPositon(position);
-                contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, 0, 1), new Vector3d(1, 0, 0), 40.5, 48, false);
+                contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 1, 0), 40.5, 48, false);
                 obstacleObject.setContactFace(contactFace);
             default:
                 break;
@@ -153,6 +165,24 @@ public class ObstacleObject extends DrawableObject {
         super.draw(gl);
         for (int i = 1; i < models.size(); i++) {
             models.get(i).draw(gl);
+        }
+    }
+
+    @Override
+    public void setPositon(Vector3d positon) {
+        super.setPositon(positon);
+
+        for (int i = 1; i < models.size(); i++) {
+            models.get(i).setPositon(positon);
+        }
+    }
+
+    @Override
+    public void setAttitude(Matrix3d attitude) {
+        super.setAttitude(attitude);
+
+        for (int i = 1; i < models.size(); i++) {
+            models.get(i).setAttitude(attitude);
         }
     }
 }

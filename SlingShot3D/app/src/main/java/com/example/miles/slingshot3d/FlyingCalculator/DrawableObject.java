@@ -96,10 +96,11 @@ public class DrawableObject {
     public Matrix4d getTransMatrix() {
         transMatrix.setIdentity();
         transMatrix.setRotation(attitude);
-        Matrix4d tmp = new Matrix4d();
-        tmp.setIdentity();
-        tmp.setTranslation(positon);
-        transMatrix.add(tmp);
+        transMatrix.setTranslation(positon);
+//        Matrix4d tmp = new Matrix4d();
+//        tmp.setIdentity();
+//        tmp.setTranslation(positon);
+//        transMatrix.add(tmp);
         return transMatrix;
     }
 
@@ -121,6 +122,10 @@ public class DrawableObject {
 
     public Vector3d getPositon() {
         return positon;
+    }
+
+    public Matrix3d getAttitude() {
+        return attitude;
     }
 
     public float[] getPositonf() {
