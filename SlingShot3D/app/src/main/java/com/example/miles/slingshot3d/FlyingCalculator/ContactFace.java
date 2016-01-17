@@ -39,7 +39,7 @@ public class ContactFace {
 
     public ContactFace(Point3d contactFaceCenter, Vector3d contactFaceFront,
                        double contactFaceD, boolean isTwoSide) { // constructor for circle contact face
-        this(CONTACT_FACE_CIRCLE, contactFaceCenter, contactFaceFront, null, contactFaceD, contactFaceD, isTwoSide);
+        this(CONTACT_FACE_CIRCLE, contactFaceCenter, contactFaceFront, new Vector3d(), contactFaceD, contactFaceD, isTwoSide);
     }
 
     public ContactFace(Point3d contactFaceCenter, Vector3d contactFaceFront, Vector3d contactFaceUp,

@@ -58,13 +58,26 @@ public class HandleScene {
     //****ground****//
     private ObstacleObject ground;
 
+    //****Ring****//
+    private ObstacleObject ring;
+
     //****tree****//
     private DrawableObject treeBase;
     private DrawableObject treeLeaf;
 
+    //****win****//
+    private DrawableObject letterw;
+    private DrawableObject letteri;
+    private DrawableObject lettern;
+
+    //****fire****//
+    private DrawableObject vase;
+    private DrawableObject fire;
+
     private Context context;
 
     private boolean MODEL_LOADED = false;
+    private boolean WIN = false;
 
     private FlyingCalculator fc;
 
@@ -170,9 +183,17 @@ public class HandleScene {
             ground.draw(gl);
             brickWall1.draw(gl);
             brickWall2.draw(gl);
+            ring.draw(gl);
             drawTree(gl);
+            drawFire(gl);
+
+            if (WIN) {
+                drawWIN(gl);
+            }
+
             if (isReady) {
                 //not shooting yet
+                ring.setPastRing(false);
                 monsterball.setPositon(new Vector3d());
                 gl.glLoadMatrixf(projectileM, 0);
                 monsterball.draw(gl);
@@ -200,7 +221,6 @@ public class HandleScene {
                 }
                 gl.glLoadMatrixf(baseM, 0);
                 monsterball.draw(gl);
-                Log.e("Ready", "shoot");
             }
 
             gl.glLoadMatrixf(baseM, 0);
@@ -215,8 +235,10 @@ public class HandleScene {
             if (STATE_CHANGING) {
                 switch (gameState) {
                     case 0: {
+                        WIN = false;
                         brickWall1.setPositon(new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 24));
                         brickWall2.setPositon(new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 10000));
+                        ring.setPositon(new Vector3d(0, 300, -SLING_SHOT_HEIGHT + 10000));
                     }
                     break;
                     case 1: {
@@ -231,6 +253,7 @@ public class HandleScene {
                     break;
                     case 2: {
                         brickWall1.setPositon(new Vector3d(-21, 300, -SLING_SHOT_HEIGHT + 70));
+                        ring.setPositon(new Vector3d(0, 300, -SLING_SHOT_HEIGHT + 150));
                         brickWall2.setPositon(new Vector3d(21, 300, -SLING_SHOT_HEIGHT + 70));
                         Matrix3d matrix3d = new Matrix3d();
                         matrix3d.setIdentity();
@@ -239,7 +262,10 @@ public class HandleScene {
                     }
                     break;
                     case 3: {
-                        Log.e("flying", "Win");
+                        brickWall1.setPositon(new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 10000));
+                        brickWall2.setPositon(new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 10000));
+                        ring.setPositon(new Vector3d(0, 300, -SLING_SHOT_HEIGHT + 10000));
+                        WIN = true;
                     }
                     break;
                 }
@@ -274,14 +300,6 @@ public class HandleScene {
         line.setColor(Color.GREEN, Color.HSVToColor(255, hsv));
     }
 
-    private void drawWall(GL10 gl, ObstacleObject wall, float scale, float angle) {
-        gl.glLoadMatrixf(baseM, 0);
-        gl.glTranslatef(wall.getPositonf()[0], wall.getPositonf()[1], wall.getPositonf()[2]);
-        gl.glScalef(scale, scale, scale);
-        gl.glRotatef(90 + angle, 1, 0, 0);
-        wall.draw(gl);
-    }
-
     private void drawPIKA(GL10 gl, float scale) {
         gl.glTranslatef(picaPosition.x, picaPosition.y, picaPosition.z);
         gl.glScalef(scale, scale, scale);
@@ -293,11 +311,34 @@ public class HandleScene {
     }
 
     private void drawTree(GL10 gl) {
-        gl.glTranslatef(80.0f, 80.0f, 0);
+        gl.glLoadMatrixf(baseM, 0);
+        gl.glTranslatef(180, 380, -SLING_SHOT_HEIGHT + 50);
         gl.glRotatef(90, 1, 0, 0);
         gl.glScalef(0.05f, 0.05f, 0.05f);
         treeBase.draw(gl);
         treeLeaf.draw(gl);
+    }
+
+    private void drawFire(GL10 gl) {
+        gl.glLoadMatrixf(baseM, 0);
+        gl.glTranslatef(-180, 380, -SLING_SHOT_HEIGHT);
+        gl.glScalef(0.5f, 0.5f, 0.5f);
+        vase.draw(gl);
+        fire.draw(gl);
+    }
+
+
+    private void drawWIN(GL10 gl) {
+        gl.glLoadMatrixf(baseM, 0);
+        gl.glTranslatef(-40, 0, 0);
+        letterw.draw(gl);
+
+        gl.glLoadMatrixf(baseM, 0);
+        letteri.draw(gl);
+
+        gl.glLoadMatrixf(baseM, 0);
+        gl.glTranslatef(30, 0, 0);
+        lettern.draw(gl);
     }
 
     Thread loadSTL = new Thread(new Runnable() {
@@ -315,13 +356,13 @@ public class HandleScene {
             pikaTail = new DrawableObject(R.raw.pikachufixedtail, new float[]{184f / 255f, 134f / 255f, 11f / 255f}, context);
 
             //****wall****//
-            brickWall1 = ObstacleObject.create(ObstacleObject.OBSTACLE_TYPE_WALL, new Vector3d(1, 200, -SLING_SHOT_HEIGHT + 24), context);
+            brickWall1 = ObstacleObject.create(ObstacleObject.OBSTACLE_TYPE_WALL, new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 24), context);
             Matrix3d matrix3d = new Matrix3d();
             matrix3d.setIdentity();
             matrix3d.rotX(Math.PI / 2);
             brickWall1.setAttitude(matrix3d);
 
-            brickWall2 = ObstacleObject.create(ObstacleObject.OBSTACLE_TYPE_WALL, new Vector3d(2, 200, -SLING_SHOT_HEIGHT + 10000), context);
+            brickWall2 = ObstacleObject.create(ObstacleObject.OBSTACLE_TYPE_WALL, new Vector3d(0, 200, -SLING_SHOT_HEIGHT + 10000), context);
             matrix3d = new Matrix3d();
             matrix3d.setIdentity();
             matrix3d.rotX(Math.PI / 2);
@@ -334,20 +375,41 @@ public class HandleScene {
             matrix3d.mul(10.0);
             ground.setAttitude(matrix3d);
 
+            //****ring****//
+            ring = ObstacleObject.create(ObstacleObject.OBSTACLE_TYPE_BREAK, new Vector3d(0, 280, -SLING_SHOT_HEIGHT + 10000), context);
+            matrix3d = new Matrix3d();
+            matrix3d.setIdentity();
+            matrix3d.rotX(Math.PI / 2);
+            ring.setAttitude(matrix3d);
+            ring.setVelocityChangeRate(0.2);
+
             //****tree****//
             treeBase = new DrawableObject(R.raw.tbase, new float[]{184f / 255f * 0.05f, 134f / 255f * 0.05f, 11f / 255f * 0.05f}, context);
             treeLeaf = new DrawableObject(R.raw.tleaf, new float[]{0, 0.05f, 0}, context);
+
+            //****win****//
+            letterw = new DrawableObject(R.raw.w, new float[]{1, 0, 0}, context);
+            letteri = new DrawableObject(R.raw.i, new float[]{1, 0, 0}, context);
+            lettern = new DrawableObject(R.raw.n, new float[]{1, 0, 0}, context);
+
+            //****fire****//
+            vase = new DrawableObject(R.raw.vase, new float[]{102/255.0f, 34/255.0f, 0}, context);
+            fire = new DrawableObject(R.raw.flame, new float[]{1, 0, 0}, context);
+
 
             fc = new FlyingCalculator(150);
             fc.setMonsterBall(monsterball);
             fc.addObstacle(brickWall1);
             fc.addObstacle(brickWall2);
             fc.addObstacle(ground);
+            fc.addObstacle(ring);
 
             if (monsterball.isLoaded()
                     && pikaTail.isLoaded() && pikaEarR.isLoaded() && pikaEarL.isLoaded() && pikaBody.isLoaded()
                     && brickWall1.isLoaded()
-                    && treeBase.isLoaded() && treeLeaf.isLoaded()) {
+                    && treeBase.isLoaded() && treeLeaf.isLoaded()
+                    && letterw.isLoaded() && letteri.isLoaded() && lettern.isLoaded()
+                    && vase.isLoaded() && fire.isLoaded()) {
                 MODEL_LOADED = true;
             }
         }

@@ -1,6 +1,7 @@
 package com.example.miles.slingshot3d.FlyingCalculator;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.miles.slingshot3d.R;
 
@@ -23,6 +24,7 @@ public class ObstacleObject extends DrawableObject {
     public static final int OBSTACLE_TYPE_BREAK = 2;
     public static final int OBSTACLE_TYPE_GROUND = 3;
     private int obstacleType;
+    private boolean pastRing = false;
     private double velocityChangeRate = 1.0;
     private List<ContactFace> contactFaces;
     private List<DrawableObject> models;
@@ -110,7 +112,12 @@ public class ObstacleObject extends DrawableObject {
     }
 
     private void handleBreak(MovingObject target) {
-        target.getVelocity().scale(velocityChangeRate);
+        if (!pastRing) {
+            target.getVelocity().scale(velocityChangeRate);
+            Log.d("flying", "break!");
+            pastRing = true;
+        }
+
     }
 
     private void handleVanish(MovingObject target) {
@@ -134,10 +141,26 @@ public class ObstacleObject extends DrawableObject {
                 obstacleObject.setPositon(position);
                 contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 1, 0), 40.5, 48, false);
                 obstacleObject.setContactFace(contactFace);
+                break;
+
+            case OBSTACLE_TYPE_BREAK:
+                obstacleObject = new ObstacleObject(OBSTACLE_TYPE_BREAK, R.raw.ring, new float[]{0f, 0f, 1.0f}, ctx);
+                obstacleObject.setPositon(position);
+                contactFace = new ContactFace(new Point3d(0, 0, 0), new Vector3d(0, 0, 1), 60, false);
+                obstacleObject.setContactFace(contactFace);
+
             default:
                 break;
         }
         return obstacleObject;
+    }
+
+    public void setVelocityChangeRate(double rate) {
+        this.velocityChangeRate = rate;
+    }
+
+    public void setPastRing(boolean ty){
+        this.pastRing = ty;
     }
 
     public static double round(double value, int places) {
