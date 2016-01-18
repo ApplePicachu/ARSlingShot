@@ -2,6 +2,7 @@ package com.example.miles.slingshot3d;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.opengl.Matrix;
 import android.text.format.Time;
 import android.util.Log;
@@ -80,6 +81,9 @@ public class HandleScene {
     private boolean WIN = false;
 
     private FlyingCalculator fc;
+
+    private MediaPlayer mp;
+    private boolean pikaSound = false;
 
     private float[] launchLocMatrix = new float[16];
     private boolean isCaptured = false;
@@ -193,11 +197,16 @@ public class HandleScene {
 
             if (isReady) {
                 //not shooting yet
+                pikaSound = false;
                 ring.setPastRing(false);
                 monsterball.setPositon(new Vector3d());
                 gl.glLoadMatrixf(projectileM, 0);
                 monsterball.draw(gl);
             } else if (isCaptured) {
+                if(!pikaSound){
+                    mp.start();
+                    pikaSound = true;
+                }
                 monsterball.setPositon(new Vector3d(50, 380, -90 + 50));
                 openTimer++;
                 monsterball.setMonsterBallOpen(openTimer);
@@ -396,6 +405,7 @@ public class HandleScene {
             vase = new DrawableObject(R.raw.vase, new float[]{102/255.0f, 34/255.0f, 0}, context);
             fire = new DrawableObject(R.raw.flame, new float[]{1, 0, 0}, context);
 
+            mp = MediaPlayer.create(context, R.raw.pikachu);
 
             fc = new FlyingCalculator(150);
             fc.setMonsterBall(monsterball);
