@@ -1,10 +1,10 @@
 # ARSlingShot
-¡mFull 3D Sling Shot¡n
+ã€ŠFull 3D Sling Shotã€‹
 
-¶}µo¤H­û: ¦¨¤j¾÷±ñ©Ò ºÓ¤@ ¶À¤l°a ºÓ¤G §d©Ó¿o
-¹Cª±¤è¦¡: »Ý¦³µo®g¥x¼Ò«¬¥H¤Î¿ëÃÑMrker¤è¯à¹Cª±
-¦w¸Ë¤èªk: ApkÀÉ©ñ¤J¤â¾÷«á§Y¥i¦w¸Ë
-¶}µoÀô¹Ò: Android Studio 1.5.1
-ÀÉ®×¤º®e: ¸ÑÀ£ÁY«áSling Shot§Y¬°IDE±M®×
-ª©¥»±±¨î: Github:https://github.com/ApplePicachu/ARSlingShot
-¥Ü½d¼v¤ù: https://www.youtube.com/watch?v=px8GIipFx2E
+é–‹ç™¼äººå“¡: æˆå¤§æ©Ÿæ¢°æ‰€ ç¢©ä¸€ é»ƒå­è»’ ç¢©äºŒ å³æ‰¿ç©Ž  
+éŠçŽ©æ–¹å¼: éœ€æœ‰ç™¼å°„å°æ¨¡åž‹ä»¥åŠè¾¨è­˜Mrkeræ–¹èƒ½éŠçŽ©  
+å®‰è£æ–¹æ³•: Apkæª”æ”¾å…¥æ‰‹æ©Ÿå¾Œå³å¯å®‰è£  
+é–‹ç™¼ç’°å¢ƒ: Android Studio 1.5.1  
+æª”æ¡ˆå…§å®¹: è§£å£“ç¸®å¾ŒSling Shotå³ç‚ºIDEå°ˆæ¡ˆ  
+ç‰ˆæœ¬æŽ§åˆ¶: Github:https://github.com/ApplePicachu/ARSlingShot  
+ç¤ºç¯„å½±ç‰‡: https://www.youtube.com/watch?v=px8GIipFx2E  
